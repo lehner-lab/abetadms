@@ -55,7 +55,7 @@ Pipeline stage 9 ('abetadms_epistasis_analysis') performs epistasis calculations
 
 * ## Structure analyses
 
-Pipeline stage 10 ('abetadms_secondary_structure_predictions') perform secondary structure predictions. Secondary structure predictions are computationally intensive and are therefore not re-run by default. **Note:** 'Required Data' (see above) already includes precomputed results of the structure analyses. To force re-execution set 'rerun_structure = T'. Additionally, the correct path to your local copy of the [DMS2structure](https://github.com/lehner-lab/DMS2structure) repository must be specified with 'DMS2structure_path = MY_LOCAL_PATH'.
+Pipeline stage 10 ('abetadms_secondary_structure_predictions') performs secondary structure predictions. Secondary structure predictions are computationally intensive and are therefore not re-run by default. **Note:** 'Required Data' (see above) already includes precomputed results of the structure analyses. To force re-execution set 'rerun_structure = T'. Additionally, the correct path to your local copy of the [DMS2structure](https://github.com/lehner-lab/DMS2structure) repository must be specified with 'DMS2structure_path = MY_LOCAL_PATH'.
 
 # Pipeline
 
