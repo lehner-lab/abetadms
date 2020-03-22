@@ -47,7 +47,7 @@ Raw read processing is not handled by the abetadms pipeline. FastQ files from pa
 
 * ## Preprocess fitness
 
-Pipeline stage 1 ('abetadms_preprocess_fitness') reformats DiMSum files and estimates fitness of doubles mutants using bayesian framework ('bayesian_double_fitness = T'). The latter is computationally intensive (~30minutes on 10 cores) and is therefore not run by default.
+Pipeline stage 1 ('abetadms_preprocess_fitness') reformats DiMSum files and re-estimates fitness of doubles mutants using a bayesian framework ('bayesian_double_fitness = T'). The latter is computationally intensive (~30minutes on 10 cores) and is therefore not run by default.
 
 * ## Epistasis analysis
 
