@@ -75,7 +75,7 @@ abetadms <- function(
 		colour_scheme = colour_scheme,
 		execute = (first_stage <= stagenum & (last_stage == 0 | last_stage >= stagenum)))
 
-	#Combine fitness estimates from 290 and 332 experiments (regions)
+	#Combine fitness estimates
 	stagenum <- 3
 	fitness_norm_dt <- abetadms_combine_fitness(
 		fitness_list = list(
