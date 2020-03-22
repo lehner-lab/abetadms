@@ -63,7 +63,7 @@ The top-level function **abetadms()** is the recommended entry point to the pipe
 
 ## Stage 1: Preprocess fitness
 
-This stage ('abetadms_preprocess_fitness') reformats DiMSum files and estimates fitness of doubles mutants using bayesian framework ('bayesian_double_fitness = T'). The latter is computationally intensive (~30minutes on 10 cores) and is therefore not run by default.
+This stage ('abetadms_preprocess_fitness') reformats DiMSum files and re-estimates fitness of doubles mutants using a bayesian framework ('bayesian_double_fitness = T'). The latter is computationally intensive (~30minutes on 10 cores) and is therefore not run by default.
 
 ## Stage 2: Quality control plots
 
