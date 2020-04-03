@@ -6,7 +6,7 @@ Analysis scripts for processing Abeta deep mutational scanning (DMS) data.
 
 To run the abetadms pipeline you will need the following software and associated packages:
 
-* **[R](https://www.r-project.org/) >=v3.5.2** (Biostrings, caTools, corpcor, cowplot, data.table, gdata, ggplot2, GGally, hexbin, lemon, optparse, parallel, pdist, plyr, ppcor, raster, reshape2, Rpdb, RColorBrewer)
+* **[R](https://www.r-project.org/) >=v3.5.2** (Biostrings, caTools, corpcor, cowplot, data.table, fpc, gdata, ggplot2, GGally, hexbin, lemon, optparse, parallel, pdist, plyr, ppcor, raster, reshape2, Rpdb, RColorBrewer)
 
 The following packages are optional:
 
@@ -51,11 +51,12 @@ Pipeline stage 1 ('abetadms_preprocess_fitness') reformats DiMSum files and re-e
 
 * ## Epistasis analysis
 
-Pipeline stage 9 ('abetadms_epistasis_analysis') performs epistasis calculations. This stage is computationally intensive (~30minutes on 10 cores) and is therefore not run by default. **Note:** 'Required Data' (see above) already includes precomputed results of the epistasis analysis. However, to force re-execution of this stage set 'rerun_epistasis = T'. Additionally, the correct path to your local copy of the [DMS2structure](https://github.com/lehner-lab/DMS2structure) repository must be specified with 'DMS2structure_path = MY_LOCAL_PATH'.
+Pipeline stage 10 ('abetadms_epistasis_analysis') performs epistasis calculations. This stage is computationally intensive (~30minutes on 10 cores) and is therefore not run by default. **Note:** 'Required Data' (see above) already includes precomputed results of the epistasis analysis. However, to force re-execution of this stage set 'rerun_epistasis = T'. Additionally, the correct path to your local copy of the [DMS2structure](https://github.com/lehner-lab/DMS2structure) repository must be specified with 'DMS2structure_path = MY_LOCAL_PATH'.
 
 * ## Structure analyses
 
-Pipeline stage 10 ('abetadms_secondary_structure_predictions') performs secondary structure predictions. Secondary structure predictions are computationally intensive and are therefore not re-run by default. **Note:** 'Required Data' (see above) already includes precomputed results of the structure analyses. To force re-execution set 'rerun_structure = T'. Additionally, the correct path to your local copy of the [DMS2structure](https://github.com/lehner-lab/DMS2structure) repository must be specified with 'DMS2structure_path = MY_LOCAL_PATH'.
+Pipeline stages 11 and 12 ('abetadms_secondary_structure_predictions', 'abetadms_AB42_structure_propensities') perform secondary structure predictions and structure propensity calculations for PDB-structure derived
+contact matrices respectively. Secondary structure predictions and propensity calculations are computationally intensive and are therefore not re-run by default. **Note:** 'Required Data' (see above) already includes precomputed results of the structure analyses. To force re-execution set 'rerun_structure = T'. Additionally, the correct path to your local copy of the [DMS2structure](https://github.com/lehner-lab/DMS2structure) repository must be specified with 'DMS2structure_path = MY_LOCAL_PATH'.
 
 # Pipeline
 
@@ -93,15 +94,24 @@ This stage ('abetadms_human_disease_mutations') tests whether human disease muta
 
 This stage ('abetadms_fitness_model_summary') produces plots of results from simple linear regression models to predict variant fitness.
 
-## Stage 9: Epistasis analysis
+## Stage 9: Helix propensity of WT and fitness hotspot line plot
+
+This stage ('abetadms_wt_helix_propensity') plots helix propensity score and mean fitness effect along the length of WT Abeta.
+
+## Stage 10: Epistasis analysis
 
 This stage ('abetadms_epistasis_analysis') performs epistasis calculations. This stage is computationally intensive (~30minutes on 10 cores) and is therefore not run by default. To force re-execution of this stage set 'rerun_epistasis = T'. Additionally, the corect path to your local copy of the [DMS2structure](https://github.com/lehner-lab/DMS2structure) repository must be specified with 'DMS2structure_path = MY_LOCAL_PATH'.
 
-## Stage 10: Secondary structure predictions
+## Stage 11: Secondary structure predictions
 
 This stage ('abetadms_secondary_structure_predictions') performs secondary structure predictions and produces combined summary plots. Secondary structure predictions are computationally intensive and are therefore not re-run by default. To force re-execution of secondary structure predictions set 'rerun_structure = T'. Additionally, the corect path to your local copy of the [DMS2structure](https://github.com/lehner-lab/DMS2structure) repository must be specified with 'DMS2structure_path = MY_LOCAL_PATH'.
 
-## Stage 11: PWI heatmaps
+## Stage 12: PDB structure propensities
+
+This stage ('abetadms_AB42_structure_propensities') performs structure propensity calculations for PDB-structure derived
+contact matrices. Structure propensity calculation are computationally intensive and are therefore not re-run by default. To force re-execution of structure propensity calculations set 'rerun_structure = T'. Additionally, the corect path to your local copy of the [DMS2structure](https://github.com/lehner-lab/DMS2structure) repository must be specified with 'DMS2structure_path = MY_LOCAL_PATH'.
+
+## Stage 13: PWI heatmaps
 
 This stage ('abetadms_PWI_heatmaps') plots pair-wise interaction (PWI) score heatmaps.
 
