@@ -137,6 +137,76 @@ abetadms_secondary_structure_predictions <- function(
   }
 	ggplot2::ggsave(file=file.path(outpath, 'tdp43_ss_pred_association_score_pos_neg.pdf'), width=8, height=3, useDingbats=FALSE)
 
+	### Correlation with epistasis in/outside regions - singles
+	###########################
+
+	epi_dt <- fread(file.path(miscpath, "misc_epistasis_analysis", "doubles_cond_1", "processed_data", "DMS_epistasis.txt"))[order(mut_code1, mut_code2)]
+	doubles_dt <- fitness_dt[Nmut_aa==2,][order(mut_code1, mut_code2)]
+
+	doubles_dt[, epistasis := epi_dt[,epistasis]]
+	doubles_dt[, sigmaE := epi_dt[,sigmaE]]
+	doubles_dt[, pos_epistasis_sig := epi_dt[,pos_epistasis_sig]]
+	doubles_dt[, neg_epistasis_sig := epi_dt[,neg_epistasis_sig]]
+
+  weighted_cor <- function(input_dt){
+  	temp_dt <- input_dt[,.SD,,.SDcols = names(input_dt)[names(input_dt)!="wt"]]
+  	temp_wt <- input_dt[,wt]
+  	return(cov.wt(as.data.frame(temp_dt), wt = unlist(temp_wt), cor = T)$cor[1,2])
+  }
+
+	plot_double_epistasis_boxplot <- function(
+		input_dt, 
+		feature_name, 
+		ranges_list,
+		width = 5,
+		height = 5,
+		text_code = F,
+		plot_path
+		){
+		input_dt[, metric := .SD,,.SDcols = feature_name]
+		temp_list <- list()
+		for(i in names(ranges_list)){
+			temp_list[[i]] <- input_dt[Pos_abs1 %in% ranges_list[[i]] & Pos_abs2 %in% ranges_list[[i]],]
+			temp_list[[i]][, region := paste0(i, ":", i)]
+			temp_list[[i]] <- temp_list[[i]][!is.na(metric),.SD,,.SDcols = c("epistasis", "sigmaE", "metric", "region", "pos_epistasis_sig", "neg_epistasis_sig")]
+		}
+		plot_dt <- do.call("rbind", temp_list)
+		plot_dt[, region := factor(region, levels = paste0(names(ranges_list), ":", names(ranges_list)))]
+		plot_dt[, epistasis_sig := "Neither"]
+		plot_dt[neg_epistasis_sig==T, epistasis_sig := "Negative"]
+		plot_dt[pos_epistasis_sig==T, epistasis_sig := "Positive"]
+	  plot_colours = c(colour_scheme[["shade 0"]][[1]], colour_scheme[["shade 0"]][[2]])
+	  # plot_dt[, wt := 1/sigmaE^2]
+	  # temp_cor <- plot_dt[,.(cor = weighted_cor(.SD), n = .N),region,.SDcols = c("epistasis", "metric", "wt")]
+		d <- ggplot2::ggplot(plot_dt, ggplot2::aes(epistasis_sig, metric, colour = epistasis_sig)) +
+	    ggplot2::geom_boxplot(notch = T) +
+		  ggplot2::xlab("Significant epistasis") +
+		  ggplot2::ylab(feature_name) +
+		  ggplot2::theme_bw() +
+		  ggplot2::geom_smooth(method = "lm", colour = "black") +
+		  ggplot2::facet_wrap(region~.) +
+		  # ggplot2::coord_cartesian(ylim=c(-0.4, 0.4)) +
+		  # ggplot2::geom_text(data = temp_cor, ggplot2::aes(label = paste0("Rw = ", round(cor, 2), "\nn = ", n)), x = 0, y = 0, colour = "black", 
+		  # 	vjust = "inward", hjust = "inward")
+		# if(text_code){
+		# 	d <- d + ggplot2::geom_text(size = 2, color = "black")
+		# }
+		ggplot2::ggsave(file=plot_path, width=width, height=height, useDingbats=FALSE)
+	}
+
+	feature_name <- "AGADIR"
+	plot_double_epistasis_boxplot(
+		input_dt = copy(doubles_dt)[!is.na(sigmaE)], 
+		feature_name = feature_name, 
+		ranges_list = list(
+	  	Nterm = 1:26,
+	  	Cterm = 27:42,
+	  	Helix = 22:28),
+		width = 10, height = 5,
+		plot_path = file.path(outpath, paste0('epistasis_vs_', feature_name, '_boxplot_hotspot_doubles.pdf')))
+
+
+
 	# #Dotplots
 	# #Adjust p-values
 	# plot_dt2 <- rbind(

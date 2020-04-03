@@ -39,13 +39,14 @@ abetadms_fitness_model_summary <- function(
 	doubles_dt[, fitness := fitness_cond]
 
 	#Fitness hotspot positions
-	mean_fitness <- singles_dt[STOP==F,mean(abs(fitness))]
-	Pos_abs_hotspot <- singles_dt[Nmut_aa==1 & !STOP,.(hotspot = mean(abs(fitness))>mean_fitness),by=Pos_abs][hotspot==T,Pos_abs]
+	# mean_fitness <- singles_dt[STOP==F,mean(abs(fitness))]
+	Pos_abs_hotspot <- 27:42 #singles_dt[Nmut_aa==1 & !STOP,.(hotspot = mean(abs(fitness))>mean_fitness),by=Pos_abs][hotspot==T,Pos_abs]
 	singles_dt[, hotspot := as.numeric(Pos_abs %in% Pos_abs_hotspot)*2]
 	doubles_dt[, hotspot := as.numeric(Pos_abs1 %in% Pos_abs_hotspot) + as.numeric(Pos_abs2 %in% Pos_abs_hotspot)]
 
 	#Aggregation tool column names
 	agg_tool_columns <- c(
+		"AGADIR",
 		"DisEMBL_COILS",
 		"DisEMBL_REM465",
 		"DisEMBL_HOTLOOPS",

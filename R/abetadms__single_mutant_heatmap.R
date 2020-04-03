@@ -81,7 +81,7 @@ abetadms__single_mutant_heatmap<-function(
   xtick_labels <- NULL
   if(cluster=="none"){
     if(x_annotation == "both"){
-      xtick_labels <- paste0(colnames(heat_mat), ":", wt_seq)
+      xtick_labels <- paste0(colnames(heat_mat), "\n", wt_seq)
     }else if(x_annotation == "sequence"){
       xtick_labels <- wt_seq
     }else if(x_annotation == "position"){

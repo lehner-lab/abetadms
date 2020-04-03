@@ -57,6 +57,169 @@ abetadms_agg_tools_mutant_effects <- function(
 	#Add aggregation tool predictions (sum of effects of singles)
 	doubles_dt <- cbind(doubles_dt, as.data.table(agg_df[doubles_dt[, mut_code1],] + agg_df[doubles_dt[, mut_code2],]))
 
+	### Correlation with aggregation propensity in/outside regions - singles
+	###########################
+
+  weighted_cor <- function(input_dt){
+  	temp_dt <- input_dt[,.SD,,.SDcols = names(input_dt)[names(input_dt)!="wt"]]
+  	temp_wt <- input_dt[,wt]
+  	return(cov.wt(as.data.frame(temp_dt), wt = unlist(temp_wt), cor = T)$cor[1,2])
+  }
+
+	plot_single_fitness_scatter <- function(
+		input_dt, 
+		feature_name, 
+		ranges_list,
+		width = 5,
+		height = 5,
+		text_code = F,
+		plot_path
+		){
+		input_dt[, metric := .SD,,.SDcols = feature_name]
+		temp_list <- list()
+		for(i in names(ranges_list)){
+			temp_list[[i]] <- input_dt[Pos_abs %in% ranges_list[[i]],]
+			temp_list[[i]][, region := i]
+			temp_list[[i]] <- temp_list[[i]][!is.na(metric),.SD,,.SDcols = c("fitness", "sigma", "metric", "region", "Pos_abs", "mut_code")]
+		}
+		plot_dt <- do.call("rbind", temp_list)
+		plot_dt[, region := factor(region, levels = names(ranges_list))]
+	  plot_colours = c(colour_scheme[["shade 0"]][[1]], colour_scheme[["shade 0"]][[2]])
+	  plot_dt[, wt := 1/sigma^2]
+	  temp_cor <- plot_dt[,.(cor = weighted_cor(.SD), n = .N),region,.SDcols = c("fitness", "metric", "wt")]
+		d <- ggplot2::ggplot(plot_dt, ggplot2::aes(metric, fitness, colour = region, label = mut_code)) +
+	    ggplot2::geom_point() +
+		  ggplot2::xlab(feature_name) +
+		  ggplot2::ylab("ASS") +
+		  ggplot2::theme_bw() +
+		  ggplot2::geom_smooth(method = "lm", colour = "black") +
+		  ggplot2::facet_wrap(region~., scale = "free") +
+		  # ggplot2::coord_cartesian(ylim=c(-0.4, 0.4)) +
+		  ggplot2::geom_text(data = temp_cor, ggplot2::aes(label = paste0("Rw = ", round(cor, 2), "\nn = ", n)), x = 0, y = 0, colour = "black", 
+		  	vjust = "inward", hjust = "inward")
+		if(text_code){
+			d <- d + ggplot2::geom_text(size = 2, color = "black")
+		}
+		ggplot2::ggsave(file=plot_path, width=width, height=height, useDingbats=FALSE)
+	}
+
+	feature_name <- "Tango"
+	plot_single_fitness_scatter(
+		input_dt = copy(singles_dt), 
+		feature_name = feature_name, 
+		ranges_list = list(
+	  	Nterm = 1:26,
+	  	Cterm = 27:42,
+	  	Helix = 22:28),
+		width = 10, height = 5,
+		plot_path = file.path(outpath, paste0('fitness_vs_', feature_name, '_scatter_hotspot_singles.pdf')))
+
+	feature_name <- "AGADIR"
+	plot_single_fitness_scatter(
+		input_dt = copy(singles_dt), 
+		feature_name = feature_name, 
+		ranges_list = list(
+	  	Nterm = 1:26,
+	  	Cterm = 27:42,
+	  	Helix = 22:28),
+		width = 10, height = 5,
+		plot_path = file.path(outpath, paste0('fitness_vs_', feature_name, '_scatter_hotspot_singles.pdf')))
+
+	pos_list <- as.list(1:42)
+	names(pos_list) <- as.character(1:42)
+	feature_name <- "AGADIR"
+	plot_single_fitness_scatter(
+		input_dt = copy(singles_dt), 
+		feature_name = feature_name, 
+		ranges_list = pos_list,
+		width = 15, height = 10,
+		plot_path = file.path(outpath, paste0('fitness_vs_', feature_name, '_scatter_hotspot_singles_allpos.pdf')))
+
+	feature_name <- "PC2 (Helix propensity)"
+	plot_single_fitness_scatter(
+		input_dt = copy(singles_dt), 
+		feature_name = feature_name, 
+		ranges_list = list(
+	  	Nterm = 1:26,
+	  	Cterm = 27:42,
+	  	Helix = 22:28),
+		width = 10, height = 5,
+		plot_path = file.path(outpath, paste0('fitness_vs_', feature_name, '_scatter_hotspot_singles.pdf')))
+
+
+	### Correlation with aggregation propensity in/outside hotspot - doubles
+	###########################
+
+	plot_double_fitness_scatter <- function(
+		input_dt, 
+		feature_name, 
+		ranges_list,
+		width = 5,
+		height = 5,
+		text_code = F,
+		plot_path
+		){
+		input_dt[, metric := .SD,,.SDcols = feature_name]
+		temp_list <- list()
+		for(i in names(ranges_list)){
+			temp_list[[i]] <- input_dt[Pos_abs1 %in% ranges_list[[i]] & Pos_abs2 %in% ranges_list[[i]],]
+			temp_list[[i]][, region := paste0(i, ":", i)]
+			temp_list[[i]] <- temp_list[[i]][!is.na(metric),.SD,,.SDcols = c("fitness_cond", "sigma_cond", "metric", "region")]
+		}
+		plot_dt <- do.call("rbind", temp_list)
+		plot_dt[, region := factor(region, levels = paste0(names(ranges_list), ":", names(ranges_list)))]
+	  plot_colours = c(colour_scheme[["shade 0"]][[1]], colour_scheme[["shade 0"]][[2]])
+	  plot_dt[, wt := 1/sigma_cond^2]
+	  temp_cor <- plot_dt[,.(cor = weighted_cor(.SD), n = .N),region,.SDcols = c("fitness_cond", "metric", "wt")]
+		d <- ggplot2::ggplot(plot_dt, ggplot2::aes(metric, fitness_cond, colour = region)) +
+	    ggplot2::geom_point() +
+		  ggplot2::xlab(feature_name) +
+		  ggplot2::ylab("ASS") +
+		  ggplot2::theme_bw() +
+		  ggplot2::geom_smooth(method = "lm", colour = "black") +
+		  ggplot2::facet_wrap(region~., scale = "free") +
+		  # ggplot2::coord_cartesian(ylim=c(-0.4, 0.4)) +
+		  ggplot2::geom_text(data = temp_cor, ggplot2::aes(label = paste0("Rw = ", round(cor, 2), "\nn = ", n)), x = 0, y = 0, colour = "black", 
+		  	vjust = "inward", hjust = "inward")
+		if(text_code){
+			d <- d + ggplot2::geom_text(size = 2, color = "black")
+		}
+		ggplot2::ggsave(file=plot_path, width=width, height=height, useDingbats=FALSE)
+	}
+
+	feature_name <- "Tango"
+	plot_double_fitness_scatter(
+		input_dt = copy(doubles_dt), 
+		feature_name = feature_name, 
+		ranges_list = list(
+	  	Nterm = 1:26,
+	  	Cterm = 27:42,
+	  	Helix = 22:28),
+		width = 10, height = 5,
+		plot_path = file.path(outpath, paste0('fitness_vs_', feature_name, '_scatter_hotspot_doubles.pdf')))
+
+	feature_name <- "AGADIR"
+	plot_double_fitness_scatter(
+		input_dt = copy(doubles_dt), 
+		feature_name = feature_name, 
+		ranges_list = list(
+	  	Nterm = 1:26,
+	  	Cterm = 27:42,
+	  	Helix = 22:28),
+		width = 10, height = 5,
+		plot_path = file.path(outpath, paste0('fitness_vs_', feature_name, '_scatter_hotspot_doubles.pdf')))
+
+	feature_name <- "PC2 (Helix propensity)"
+	plot_double_fitness_scatter(
+		input_dt = copy(doubles_dt), 
+		feature_name = feature_name, 
+		ranges_list = list(
+	  	Nterm = 1:26,
+	  	Cterm = 27:42,
+	  	Helix = 22:28),
+		width = 10, height = 5,
+		plot_path = file.path(outpath, paste0('fitness_vs_', feature_name, '_scatter_hotspot_doubles.pdf')))
+
 	# ### Aggregation scales correlation with single mutants in hotspot
 	# ###########################
 

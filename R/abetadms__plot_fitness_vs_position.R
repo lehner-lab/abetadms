@@ -60,14 +60,14 @@ abetadms__plot_fitness_vs_position <- function(
   }
   #Plot fitness hotspot?
   if(plot_hotspot){
-    mean_fitness <- plot_dt_orig[,mean(fitness)]
-    pos_hotspot <- plot_dt_orig[,.(hotspot = mean(fitness)>mean_fitness),by=Pos][hotspot==T,Pos]
+    # mean_fitness <- plot_dt_orig[,mean(fitness)]
+    pos_hotspot <- 27:42 #plot_dt_orig[,.(hotspot = mean(fitness)>mean_fitness),by=Pos][hotspot==T,Pos]
     d <- d + 
       ggplot2::geom_rect(
         ggplot2::aes(xmin=min(pos_hotspot)-0.5, xmax=max(pos_hotspot)+0.5, ymin=min(plot_dt[,fitness_low]), ymax=plot_dt[,max(fitness_high)]), 
         fill = "grey", 
-        linetype = 0) +
-      ggplot2::geom_hline(yintercept = mean_fitness, linetype = 2)
+        linetype = 0) #+
+      # ggplot2::geom_hline(yintercept = mean_fitness, linetype = 2)
   }
   d <- d + ggplot2::geom_linerange(ggplot2::aes(ymin=fitness_low, ymax=fitness_high)) +
     ggplot2::geom_smooth(data = plot_dt_orig, method = "loess", span = span, colour = "black", se = F) +

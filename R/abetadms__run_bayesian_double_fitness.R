@@ -103,7 +103,8 @@ abetadms__run_bayesian_double_fitness <- function(
     Nneighbours <- 500
     score_prior_cond <- double_data[count_in >= min_input_read_count_doubles & F > -Inf & F1 > -Inf & F2 > -Inf]
 
-    # make variables available to each core's workspace
+    # set seed stream and make variables available to each core's workspace
+    parallel::clusterSetRNGStream(cl = clust,1234567)
     parallel::clusterExport(clust, list("double_data","lam_d","wt_corr","score_prior_cond","Nneighbours"), envir = environment())
 
     #posterior fitness conditioned on single fitness

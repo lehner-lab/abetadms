@@ -140,19 +140,19 @@ abetadms <- function(
 	# 	colour_scheme = colour_scheme,
 	# 	execute = (first_stage <= stagenum & (last_stage == 0 | last_stage >= stagenum)))
 
-	# #Hydrophobicity of WT and fitness hotspot line plot
-	# stagenum <- 10
-	# abetadms_wt_hydrophobicity(
-	# 	fitness_dt = fitness_aggtools_dt,
-	# 	outpath = abetadms__format_dir(dir_suffix="_abetadms_wt_hydrophobicity", stagenum=stagenum, base_dir=base_dir),
-	# 	aaprop_file = file.path(base_dir, "misc", "amino_acid_properties", "amino_acid_properties_annotated_supplementary.txt"),
-	# 	aaprop_file_selected = file.path(base_dir, "misc", "amino_acid_properties", "selected.amino_acid_properties.txt"),
-	# 	wtfasta_path = file.path(base_dir, "misc", "TARDBP.fa"),
-	# 	colour_scheme = colour_scheme,
-	# 	execute = (first_stage <= stagenum & (last_stage == 0 | last_stage >= stagenum)))
+	#Helix propensity of WT and fitness hotspot line plot
+	stagenum <- 9
+	abetadms_wt_helix_propensity(
+		fitness_dt = fitness_aggtools_dt,
+		outpath = abetadms__format_dir(dir_suffix="_abetadms_wt_helix_propensity", stagenum=stagenum, base_dir=base_dir),
+		aaprop_file = file.path(base_dir, "misc", "amino_acid_properties", "amino_acid_properties_annotated_supplementary.txt"),
+		aaprop_file_selected = file.path(base_dir, "misc", "amino_acid_properties", "selected.amino_acid_properties.txt"),
+		wtfasta_path = file.path(base_dir, "misc", "AB42.fa"),
+		colour_scheme = colour_scheme,
+		execute = (first_stage <= stagenum & (last_stage == 0 | last_stage >= stagenum)))
 
 	#Epistasis analysis
-	stagenum <- 9
+	stagenum <- 10
 	abetadms_epistasis_analysis(
 		fitness_path = file.path(base_dir, "003_abetadms_combine_fitness", "combine_fitness_values.RData"),
 		miscpath = file.path(base_dir, "misc"),
@@ -161,7 +161,7 @@ abetadms <- function(
 		execute = (first_stage <= stagenum & (last_stage == 0 | last_stage >= stagenum) & rerun_epistasis))
 
 	#Secondary structure predictions
-	stagenum <- 10
+	stagenum <- 11
 	abetadms_secondary_structure_predictions(
 		fitness_dt = fitness_aggtools_dt,
 		outpath = abetadms__format_dir(dir_suffix="_abetadms_secondary_structure_predictions", stagenum=stagenum, base_dir=base_dir),
@@ -171,19 +171,19 @@ abetadms <- function(
 		execute = (first_stage <= stagenum & (last_stage == 0 | last_stage >= stagenum)),
 		rerun_structure = rerun_structure)
 
-	# #Guenther structure propensities
-	# stagenum <- 13
-	# abetadms_guenther_structure_propensities(
-	# 	result_dir = file.path(base_dir, "misc", "misc_guenther_structures"),
-	# 	outpath = abetadms__format_dir(dir_suffix="_abetadms_guenther_structure_propensities", stagenum=stagenum, base_dir=base_dir),
-	# 	miscpath = file.path(base_dir, "misc"),
-	# 	DMS2structure_path = DMS2structure_path,
-	# 	colour_scheme = colour_scheme,
-	# 	execute = (first_stage <= stagenum & (last_stage == 0 | last_stage >= stagenum)),
-	# 	rerun_structure = rerun_structure)
+	#Guenther structure propensities
+	stagenum <- 12
+	abetadms_AB42_structure_propensities(
+		result_dir = file.path(base_dir, "misc", "misc_AB42_structures"),
+		outpath = abetadms__format_dir(dir_suffix="_abetadms_AB42_structure_propensities", stagenum=stagenum, base_dir=base_dir),
+		miscpath = file.path(base_dir, "misc"),
+		DMS2structure_path = DMS2structure_path,
+		colour_scheme = colour_scheme,
+		execute = (first_stage <= stagenum & (last_stage == 0 | last_stage >= stagenum)),
+		rerun_structure = rerun_structure)
 
 	#PWI heatmaps
-	stagenum <- 11
+	stagenum <- 13
 	abetadms_PWI_heatmaps(
 		PWI_dir_list = list(
 			"1" = file.path(base_dir, "misc", "misc_epistasis_analysis/doubles_cond_1/processed_data/")),
