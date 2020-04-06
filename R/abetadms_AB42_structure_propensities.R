@@ -154,6 +154,44 @@ abetadms_AB42_structure_propensities <- function(
 	   }
 	}
 
+	### Kernel smooth scores - randomisation strategy: kernal width - xyplot: score significance versus score specificity 
+	###########################
+
+	plot_list <- list()
+	for(i in names(pdb_list)){
+		idx_pos <- pdb_list[[i]][["idx_start"]]
+		plot_list[[i]] <- data.table(
+			association_score_significance = -log10(kernel_scores_kernal_width[[i]][Pos==idx_pos,association_score_norm_kernel_p]),
+			association_score_specificity = kernel_scores_kernal_width[[i]][,.(Pos, specificity = rank(association_score_norm_kernel_score)/.N)][Pos==idx_pos,specificity],
+			epistasis_score_significance = -log10(kernel_scores_kernal_width[[i]][Pos==idx_pos,epistasis_score_norm_kernel_p]),
+			epistasis_score_specificity = kernel_scores_kernal_width[[i]][,.(Pos, specificity = rank(epistasis_score_norm_kernel_score)/.N)][Pos==idx_pos,specificity])
+	}
+
+	plot_dt <- do.call("rbind", plot_list)
+	plot_dt[, structure := names(plot_list)]
+	plot_dt_as <- plot_dt[,c(1:2, 5)]
+	names(plot_dt_as)[1:2] <- c("score_significance", "score_specificity")
+	plot_dt_es <- plot_dt[,c(3:4, 5)]
+	names(plot_dt_es)[1:2] <- c("score_significance", "score_specificity")
+	plot_dt <- rbind(plot_dt_as, plot_dt_es)
+	plot_dt[, score := rep(c("association_score", "epistasis_score"), each = length(plot_list))]
+	plot_dt[, pdb := toupper(sapply(strsplit(structure, "_"), '[', 1))]
+	plot_dt[, type := sapply(strsplit(structure, "_"), '[', 2)]
+
+  d <- ggplot2::ggplot(plot_dt, ggplot2::aes(score_specificity, score_significance, label = pdb)) +
+    ggplot2::geom_smooth(method = "lm", formula = "y ~ poly(x, 2)", colour = "grey", se = F) +
+    ggplot2::geom_point() + 
+    ggplot2::theme_bw() +
+    ggplot2::geom_text(nudge_y = 0.2, size = 3) +
+    ggplot2::facet_grid(type~score, scales = "free_x") +
+	  ggplot2::xlab("Structure position specificity (normalised score rank)") +
+	  ggplot2::ylab("Structure similatiry\n-log10(P-value)") +
+    # ggplot2::geom_vline(xintercept = 0, linetype=2) +
+    ggplot2::geom_hline(yintercept = -log10(0.01), linetype=2, colour = "red")
+  #Save
+  ggplot2::ggsave(file=file.path(outpath, paste0("kernel_propensity_kernal_width_xy_association_score.pdf")), d, width=7, height=7, useDingbats=FALSE)
+
+
 }
 
 
